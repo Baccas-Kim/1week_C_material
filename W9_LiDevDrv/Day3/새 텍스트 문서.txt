@@ -1,0 +1,4 @@
+https://docs.huihoo.com/doxygen/linux/kernel/3.7/gpio-nrs_8h.html
+
+
+https://elixir.bootlin.com/linux/v3.2/source/arch/arm/plat-samsung/include/plat/gpio-cfg.h#L72

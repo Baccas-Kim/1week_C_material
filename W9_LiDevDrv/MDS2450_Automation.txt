@@ -1,0 +1,158 @@
+setenv bootdelay 1;set serverip 192.168.20.90;set ipaddr 192.168.20.3;
+
+bootcmd tftp 30008000 zImage;
+
+;
+;	u-boot env setup scripts
+;		by Seo Kwang Won
+;
+
+;
+;  u-boot saves env into NAND offset:0x40000  size:0x20000 
+;
+
+;
+;  history:   
+11:33 2017-06-27	fixed ramdisk error
+
+;
+;  ^c -> alt-v  each line to terraterm
+;
+;  don't copy multi-lines!
+;
+
+
+set bootdelay 5
+
+set serverip  192.168.0.2	
+set gatewayip 192.168.0.1	
+set ipaddr    192.168.0.102	
+set netmask   255.255.255.0	
+
+; echo firmware download address
+; echo linux zImage down address
+; echo this should be hex. otherwise INITRD mount would fail !
+set firmaddr 0x30000000	
+set zImgaddr 0x32000000	
+set ramdaddr 0x30800000 
+
+; echo dongsoo board use UART1 as console
+set ramdsize 16M
+set terminal ttySAC1,115200n81	
+
+set bootcmd_firmw tftp $firmaddr aImage.bin ';' go $firmaddr
+set bootcmd_linux tftp $zImgaddr zImage  ';' bootm $zImgaddr
+set bootcmd_getzr tftp $zImgaddr zImage  ';' tftp $ramdaddr ramdisk.gz 
+set bootcmd_rdisk $bootcmd_getzr ';' bootm $zImgaddr
+set bootcmd_initr nand read $zImgaddr 00080000 00500000 ';' nand read $ramdaddr 00600000 01000000 ';' bootm $zImgaddr
+set bootcmd_yaffs nand read $zImgaddr 00080000 00400000 ';' bootm $zImgaddr
+
+set bootargs_nfs root=/dev/nfs rw nfsroot=$serverip:/nfsroot ip=$ipaddr:$serverip:$gatewayip:$netmask::eth0:off:netmask=$netmask console=$terminal
+set bootargs_ram initrd=$ramdaddr,$ramdsize root=/dev/ram rw console=$terminal
+set bootargs_mtd root=/dev/mtdblock2 rw rootfstype=yaffs2 console=$terminal
+
+
+;
+; ======================================================================
+; booting scenario #1.  TFTP - NFS
+;
+set bootcmd $bootcmd_linux
+set bootargs $bootargs_nfs
+save
+
+;
+; ======================================================================
+; booting scenario #2.  rdisk scenario
+;
+set bootcmd $bootcmd_rdisk
+set bootargs $bootargs_ram
+save
+
+;
+; ======================================================================
+; booting scenario #3.  NAND - initr scenario
+;
+
+set nand_zImage_erase  nand erase           00080000 00500000
+set nand_zImage_write  nand write $zImgaddr 00080000 00500000
+
+set nand_initrd_erase  nand erase           00600000 01000000
+set nand_initrd_write  nand write $ramdaddr 00600000 01000000
+
+set bootcmd $bootcmd_initr
+set bootargs $bootargs_ram
+save
+
+;
+; ======================================================================
+;  booting scenario #4. NAND - YAFFS2
+;
+set bootcmd $bootcmd_yaffs
+set bootargs $bootargs_mtd
+save
+
+
+
+
+============================================================
+boot    - boot default, i.e., run 'bootcmd'
+bootd   - boot default, i.e., run 'bootcmd'
+bootp   - boot image via network using BootP/TFTP protocol
+bootvx  - Boot vxWorks from an ELF image
+chpart  - change active partition
+cmp      - memory compare
+coninfo - print console devices and information
+cp       - memory copy
+crc32    - checksum calculation
+date    - get/set/reset date & time
+dcache  - enable or disable data cache
+dhcp    - invoke DHCP client to obtain IP/boot params
+dnw     - initialize USB device and ready to receive for Windows server (specific)
+echo    - echo args to console
+erase   - erase FLASH memory
+exit    - exit script
+ext2load- load binary file from a Ext2 filesystem
+ext2ls  - list files in a directory (default /)
+fatinfo - print information about filesystem
+fatload - load binary file from a dos filesystem
+fatls   - list files in a directory (default /)
+flinfo  - print FLASH memory information
+fsinfo  - print information about filesystems
+fsload  - load binary file from a filesystem image
+go      - start application at address 'addr'
+help    - print online help
+icache  - enable or disable instruction cache
+iminfo  - print header information for application image
+imls    - list all images found in flash
+imxtract- extract a part of a multi-image
+insnand - install SD/MMC bootloader image to NAND flash
+itest   - return true/false on integer compare
+loadb   - load binary file over serial line (kermit mode)
+loads   - load S-Record file over serial line
+loady   - load binary file over serial line (ymodem mode)
+loop     - infinite loop on address range
+ls      - list files in a directory (default /)
+md       - memory display
+mm       - memory modify (auto-incrementing)
+mmcinit - init mmc card
+movi    - moviNAND sub-system
+mtdparts- define flash/nand partitions
+mtest    - simple RAM test
+mw       - memory write (fill)
+nand    - NAND sub-system
+nfs     - boot image via network using NFS protocol
+nm       - memory modify (constant address)
+ping    - send ICMP ECHO_REQUEST to network host
+printenv- print environment variables
+protect - enable or disable FLASH write protection
+rarpboot- boot image via network using RARP/TFTP protocol
+reset   - Perform RESET of the CPU
+reginfo - print register information
+reset   - Perform RESET of the CPU
+run     - run commands in an environment variable
+saveenv - save environment variables to persistent storage
+setenv  - set environment variables
+sleep   - delay execution for some time
+test    - minimal test like /bin/sh
+command testtftpboot- boot image via network using TFTP protocol
+version - print monitor version
