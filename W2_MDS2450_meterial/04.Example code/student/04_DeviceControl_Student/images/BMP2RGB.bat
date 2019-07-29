@@ -1,2 +1,0 @@
-BMP2RGB jeehye01
-BMP2RGB jeehye02

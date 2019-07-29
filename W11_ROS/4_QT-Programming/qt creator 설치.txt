@@ -1,0 +1,51 @@
+
+sudo apt-get install qtcreator gcc qtbase5-dev
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Installation:
+
+sudo apt-get update
+sudo apt-get upgrade
+
+sudo apt-get install qtcreator gcc qtbase5-dev
+
+
+공개키 오류 해결 방법
+sudo apt-key adv ?keyserver keyserver.ubuntu.com ?recv-keys F1656F24C74CD1D8
+
+
+
+Configure QtCreator:
+
+Tools->Options->Build & Run
+ Add manual toolchain
+ Compiler path: /usr/bin/g++
+ Debugger: /usr/bin/gdb
+
+
+
+http://webnautes.tistory.com/957
+
+http://helloraspberrypi.blogspot.kr/2016/03/install-qt5qt-creator-for-raspberry-pi.html
+
+
